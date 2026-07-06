@@ -1,0 +1,252 @@
+# CD Pipeline - Builds and deploys to AWS
+# Builds Docker image with CodeBuild, then deploys to App Runner
+
+name: CD - Deploy to AWS
+
+on:
+  push:
+    branches: [main, dev]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REPOSITORY: converge-global-fe
+
+jobs:
+  # Step 1: Build Docker image using AWS CodeBuild
+  build-image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    outputs:
+      image-uri: ${{ steps.get-image.outputs.image-uri }}
+      environment: ${{ steps.determine-env.outputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine environment
+        id: determine-env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Package source code
+        run: |
+          zip -r source.zip . -x "node_modules/*" ".git/*" ".terraform/*" ".next/*" "*.log"
+
+      - name: Upload to S3
+        run: |
+          BUCKET_NAME="codebuild-source-$(aws sts get-caller-identity --query Account --output text)"
+          aws s3 mb s3://$BUCKET_NAME --region ${{ env.AWS_REGION }} 2>/dev/null || true
+          aws s3 cp source.zip s3://$BUCKET_NAME/converge-global-fe-${{ github.sha }}.zip
+
+      - name: Trigger CodeBuild
+        id: codebuild
+        run: |
+          BUCKET_NAME="codebuild-source-$(aws sts get-caller-identity --query Account --output text)"
+          # Note: Using --environment-variables-override REPLACES all env vars
+          # So we must include all required variables, not just IMAGE_TAG
+          BUILD_ID=$(aws codebuild start-build \
+            --project-name converge-global-fe-staging-build \
+            --source-type-override S3 \
+            --source-location-override "$BUCKET_NAME/converge-global-fe-${{ github.sha }}.zip" \
+            --query 'build.id' \
+            --output text)
+          echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "🔨 CodeBuild started: $BUILD_ID"
+          echo "Note: Using CodeBuild project's configured environment variables"
+
+      - name: Wait for build completion
+        run: |
+          BUILD_ID="${{ steps.codebuild.outputs.build-id }}"
+          echo "⏳ Waiting for build to complete..."
+
+          while true; do
+            STATUS=$(aws codebuild batch-get-builds --ids $BUILD_ID --query 'builds[0].buildStatus' --output text)
+            echo "📊 Status: $STATUS"
+            
+            if [ "$STATUS" = "SUCCEEDED" ]; then
+              echo "✅ Build completed successfully!"
+              break
+            elif [ "$STATUS" = "FAILED" ] || [ "$STATUS" = "FAULT" ] || [ "$STATUS" = "STOPPED" ] || [ "$STATUS" = "TIMED_OUT" ]; then
+              echo "❌ Build failed: $STATUS"
+              exit 1
+            fi
+            
+            sleep 30
+          done
+
+      - name: Get image URI
+        id: get-image
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          # CodeBuild tags with build number, so we use 'latest' tag for deployment
+          IMAGE_URI="$ACCOUNT_ID.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest"
+          echo "image-uri=$IMAGE_URI" >> $GITHUB_OUTPUT
+          echo "🐳 Image: $IMAGE_URI"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f source.zip
+          BUCKET_NAME="codebuild-source-$(aws sts get-caller-identity --query Account --output text)"
+          aws s3 rm s3://$BUCKET_NAME/converge-global-fe-${{ github.sha }}.zip || true
+
+  # Step 2: Deploy to App Runner using Terraform
+  deploy:
+    name: Deploy to ${{ needs.build-image.outputs.environment }}
+    runs-on: ubuntu-latest
+    needs: build-image
+    environment:
+      name: ${{ needs.build-image.outputs.environment }}
+      url: ${{ steps.get-url.outputs.url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.0"
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        env:
+          ENV: ${{ needs.build-image.outputs.environment }}
+        run: |
+          terraform init -backend-config="key=converge-global-fe/${ENV}.tfstate"
+
+      - name: Wait for App Runner to be ready
+        working-directory: ./terraform
+        env:
+          ENV: ${{ needs.build-image.outputs.environment }}
+        run: |
+          SERVICE_NAME="converge-global-fe-${ENV}"
+          echo "⏳ Checking App Runner service '$SERVICE_NAME' status..."
+
+          # Try to get service ARN from terraform state
+          SERVICE_ARN=$(terraform output -raw app_runner_service_arn 2>/dev/null || echo "")
+
+          if [ -z "$SERVICE_ARN" ]; then
+            echo "ℹ️ Service doesn't exist yet (first deployment), skipping wait..."
+            exit 0
+          fi
+
+          echo "⏳ Waiting for App Runner service to be ready..."
+          MAX_WAIT=600  # 10 minutes max wait
+          ELAPSED=0
+          SLEEP_INTERVAL=30
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "$SERVICE_ARN" \
+              --query 'Service.Status' \
+              --output text 2>/dev/null || echo "UNKNOWN")
+            
+            if [ "$STATUS" = "RUNNING" ]; then
+              echo "✅ Service status: $STATUS - ready for updates"
+              break
+            elif [ "$STATUS" = "CREATE_FAILED" ] || [ "$STATUS" = "UPDATE_FAILED" ]; then
+              echo "⚠️ Service is in $STATUS state, proceeding anyway..."
+              break
+            elif [ "$STATUS" = "OPERATION_IN_PROGRESS" ] || [ "$STATUS" = "CREATE_IN_PROGRESS" ] || [ "$STATUS" = "UPDATE_IN_PROGRESS" ]; then
+              echo "⏳ Service status: $STATUS (waiting ${SLEEP_INTERVAL}s...)"
+              sleep $SLEEP_INTERVAL
+              ELAPSED=$((ELAPSED + SLEEP_INTERVAL))
+            else
+              echo "ℹ️ Service status: $STATUS - proceeding..."
+              break
+            fi
+          done
+
+          if [ $ELAPSED -ge $MAX_WAIT ]; then
+            echo "⚠️ Timeout waiting for service to be ready, proceeding anyway..."
+          fi
+
+      - name: Deploy with Terraform (with retry)
+        working-directory: ./terraform
+        env:
+          TF_VAR_container_image_uri: ${{ needs.build-image.outputs.image-uri }}
+        run: |
+          ENV="${{ needs.build-image.outputs.environment }}"
+          echo "🚀 Deploying to $ENV..."
+
+          MAX_RETRIES=5
+          RETRY_DELAY=60
+          ATTEMPT=1
+
+          while [ $ATTEMPT -le $MAX_RETRIES ]; do
+            echo "📝 Attempt $ATTEMPT of $MAX_RETRIES..."
+            
+            # Capture both stdout and stderr
+            OUTPUT=$(terraform apply -auto-approve -var-file="environments/${ENV}.tfvars" 2>&1)
+            EXIT_CODE=$?
+            
+            if [ $EXIT_CODE -eq 0 ]; then
+              echo "$OUTPUT"
+              echo "✅ Terraform apply succeeded!"
+              exit 0
+            else
+              echo "$OUTPUT"
+              ERROR_MSG=$(echo "$OUTPUT" | grep -i "OPERATION_IN_PROGRESS" || echo "")
+              
+              if [ -n "$ERROR_MSG" ] && [ $ATTEMPT -lt $MAX_RETRIES ]; then
+                echo "⚠️ App Runner is still processing an operation. Waiting ${RETRY_DELAY}s before retry..."
+                sleep $RETRY_DELAY
+                ATTEMPT=$((ATTEMPT + 1))
+              else
+                echo "❌ Terraform apply failed (not retryable or max retries reached)"
+                exit $EXIT_CODE
+              fi
+            fi
+          done
+
+          echo "❌ Max retries reached. Deployment failed."
+          exit 1
+
+      - name: Get deployment URL
+        id: get-url
+        working-directory: ./terraform
+        run: |
+          APP_URL=$(terraform output -raw app_runner_service_url)
+          echo "url=$APP_URL" >> $GITHUB_OUTPUT
+          echo "✅ Deployment complete!"
+          echo "🌐 URL: $APP_URL"
+
+      - name: Summary
+        run: |
+          echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** ${{ needs.build-image.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image:** \`${{ needs.build-image.outputs.image-uri }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL:** ${{ steps.get-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY

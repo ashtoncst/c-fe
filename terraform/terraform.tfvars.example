@@ -1,0 +1,58 @@
+# This is an example Terraform variables file
+# Copy this file to terraform.tfvars and customize the values for your deployment
+# The terraform.tfvars file will be ignored by git for security
+
+# Basic Configuration
+project_name = "converge-global-fe"
+environment  = "dev"  # Options: dev, staging, production
+aws_region   = "us-east-1"
+
+# Optional: AWS Profile for authentication
+# Uncomment and set this if you want to use a specific AWS profile
+# This is useful for switching between personal and work AWS accounts
+# aws_profile = "personal"  # or "work", "default", etc.
+
+# Application Configuration
+app_name = "converge-global-frontend"
+
+# App Runner Configuration
+app_runner_cpu    = "0.25"  # Options: 0.25, 0.5, 1, 2, 4
+app_runner_memory = "0.5"   # Options: 0.5, 1, 2, 3, 4, 6, 8, 10, 12
+
+# Auto Scaling Configuration
+app_runner_auto_scaling_min_size         = 1
+app_runner_auto_scaling_max_size         = 10
+app_runner_auto_scaling_max_concurrency  = 100
+
+# Backend API Configuration
+# IMPORTANT: These URLs should point to your backend service
+# For production deployments:
+# - api_url should use HTTPS (https://)
+# - socket_url MUST use WSS (wss://) for mobile browser compatibility
+# Mobile browsers strictly enforce mixed content policy and will block ws:// on HTTPS pages
+api_url = "https://your-backend-cloudfront-url.cloudfront.net/api"
+socket_url = "wss://your-backend-cloudfront-url.cloudfront.net"
+
+# Development (local backend) example:
+# api_url = "http://localhost:3000/api"
+# socket_url = "ws://localhost:3000"
+
+# GitHub Integration (Optional)
+# If you want automatic deployments from GitHub, provide these values
+# github_repository_url = "https://github.com/your-username/converge-global-fe"
+# github_branch         = "main"
+
+# Custom Domain (Optional)
+# If you want to use a custom domain, set these values
+# enable_custom_domain = true
+# domain_name         = "your-domain.com"
+
+# Monitoring
+enable_monitoring = true
+
+# Additional Tags
+tags = {
+  Owner       = "YourName"
+  CostCenter  = "Engineering"
+  Project     = "ConvergeGlobal"
+}

@@ -1,0 +1,310 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Base Typography Styles */
+@layer base {
+  body {
+    @apply font-normal text-body-base text-black;
+    font-family: "DM Sans", sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Ensure consistent spacing for paragraphs */
+  p {
+    @apply mb-0;
+  }
+}
+
+/* Typography Component Utilities */
+@layer components {
+  /* Standard body text classes */
+  .body-xs {
+    @apply text-body-xs tracking-body;
+  }
+
+  .body-sm {
+    @apply text-body-sm tracking-body;
+  }
+
+  .body-base {
+    @apply text-body-base tracking-body;
+  }
+
+  .body-md {
+    @apply text-body-md tracking-body;
+  }
+
+  .body-lg {
+    @apply text-body-lg tracking-body;
+  }
+
+  .caption {
+    @apply text-caption tracking-body;
+  }
+
+  /* Responsive body text */
+  .body-responsive {
+    @apply text-body-xs md:text-body-sm lg:text-body-base tracking-body;
+  }
+
+  .body-responsive-md {
+    @apply text-body-sm md:text-body-base lg:text-body-md tracking-body;
+  }
+}
+
+::-webkit-input-placeholder {
+  color: #00000080;
+  opacity: 0.5;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "DM Sans", sans-serif;
+}
+
+:-moz-placeholder {
+  color: #00000080;
+  opacity: 0.5;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "DM Sans", sans-serif;
+}
+::-moz-placeholder {
+  color: #00000080;
+  opacity: 0.5;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "DM Sans", sans-serif;
+}
+:-ms-input-placeholder {
+  color: #00000080;
+  opacity: 0.5;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "DM Sans", sans-serif;
+}
+::-ms-input-placeholder {
+  color: #00000080;
+  opacity: 0.5;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "DM Sans", sans-serif;
+}
+
+::placeholder {
+  color: #00000080;
+  opacity: 0.5;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Custom scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Scrollbar thumb */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #038f8d;
+  border-radius: 9999px;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Hover effect */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #026e6d;
+  background-clip: padding-box;
+}
+
+/* Scrollbar track background */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #eeeeee;
+  border-radius: 9999px;
+  margin: 10px 0;
+  display: block !important;
+  visibility: visible !important;
+}
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin !important;
+  scrollbar-color: #038f8d #eeeeee !important;
+  overflow-y: scroll !important; /* Always display scrollbar */
+  scrollbar-width: 14px !important; /* Set Firefox scrollbar width */
+  -webkit-overflow-scrolling: touch !important; /* Smoother scrolling on iOS */
+  overflow: -moz-scrollbars-vertical !important; /* Always show Firefox scrollbar */
+}
+.custom-scrollbar-horizontal {
+  overflow-x: auto; /* bật scroll ngang */
+  overflow-y: hidden; /* tắt scroll dọc */
+  -webkit-overflow-scrolling: touch; /* mượt trên iOS */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #038f8d #eeeeee;
+
+  /* tạo khoảng cách giữa table và scrollbar */
+}
+
+/* Scrollbar ngang - Webkit (Chrome, Edge, Safari) */
+.custom-scrollbar-horizontal::-webkit-scrollbar {
+  height: 8px; /* chiều cao scrollbar ngang */
+}
+
+/* Track */
+.custom-scrollbar-horizontal::-webkit-scrollbar-track {
+  background: #eeeeee;
+  border-radius: 9999px;
+  margin: 0 60px; /* làm scrollbar ngắn lại hai bên */
+}
+
+/* Thumb */
+.custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
+  background: #038f8d;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
+  background: #026e6d;
+}
+
+/* Custom scrollbar for table - positioned outside */
+.custom-scrollbar-table {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #038f8d #e0e0e0;
+  padding-bottom: 25px; /* khoảng cách giữa content và scrollbar */
+}
+
+.custom-scrollbar-table::-webkit-scrollbar {
+  height: 6px;
+}
+
+.custom-scrollbar-table::-webkit-scrollbar-track {
+  background: #e0e0e0;
+  border-radius: 9999px;
+  margin: 0 55px;
+}
+
+.custom-scrollbar-table::-webkit-scrollbar-thumb {
+  background: #038f8d;
+  border-radius: 9999px;
+  min-width: 100px;
+}
+
+.custom-scrollbar-table::-webkit-scrollbar-thumb:hover {
+  background: #026e6d;
+}
+
+/* Custom scrollbar for colocation section with adjusted position */
+.custom-scrollbar-product {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #038f8d #eeeeee;
+}
+
+.custom-scrollbar-product::-webkit-scrollbar {
+  height: 8px;
+}
+
+.custom-scrollbar-product::-webkit-scrollbar-track {
+  background: #eeeeee;
+  border-radius: 9999px;
+  margin: 0;
+}
+
+.custom-scrollbar-product::-webkit-scrollbar-thumb {
+  background: #038f8d;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.custom-scrollbar-product::-webkit-scrollbar-thumb:hover {
+  background: #026e6d;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE, Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.custom-slider-container .custom-slider-next {
+  top: 25%;
+}
+.custom-slider-container .custom-slider-prev {
+  top: 25%;
+}
+.custom-slider-satellite-container .custom-slider-next {
+  top: 22%;
+}
+.custom-slider-satellite-container .custom-slider-prev {
+  top: 22%;
+}
+.custom-slider-satellite-container-product .custom-slider-next {
+  top: 25%;
+}
+.custom-slider-satellite-container-product .custom-slider-prev {
+  top: 25%;
+}
+.custom-slider-satellite-starlink-values .custom-slider-next {
+  top: 50%;
+}
+.custom-slider-satellite-starlink-values .custom-slider-prev {
+  top: 50%;
+}
+.custom-slider-content-module .custom-slider-next-transport {
+  top: 35%;
+}
+.custom-slider-content-module .custom-slider-prev-transport {
+  top: 35%;
+}
+.custom-slider-colocation-module .custom-slider-next {
+  top: 35%;
+}
+.custom-slider-colocation-module .custom-slider-prev {
+  top: 35%;
+}
+.custom-slider-security-module .custom-slider-next-transport {
+  top: 40%;
+}
+.custom-slider-security-module .custom-slider-prev-transport {
+  top: 40%;
+}
+.custom-content-card-resource .custom-slider-next {
+  top: 40%;
+}
+.custom-content-card-resource .custom-slider-prev {
+  top: 40%;
+}
+.custom-slider-surveillance-module .custom-slider-next {
+  top: 40%;
+}
+.custom-slider-surveillance-module .custom-slider-prev {
+  top: 40%;
+}
+.image-custom-resource .image .image-custom {
+  @apply h-[126px] md:h-[145px] lg:h-[180px] rounded-t-[25px] rounded-b-[0px] md:rounded-b-[35px] lg:rounded-b-[50px] md:rounded-t-[35px] lg:rounded-t-[50px] !important;
+}
+.custom-padding-resource .custom-padding {
+  @apply md:pt-0 pt-[50px] !important;
+}
+.custom-content-card-resource .custom-content-card {
+  @apply lg:w-[392px] w-[275px] justify-center !important;
+}

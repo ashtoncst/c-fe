@@ -1,0 +1,46 @@
+═══════════════════════════════════════════════════════════
+         GITHUB WORKFLOWS - SIMPLIFIED & FIXED
+═══════════════════════════════════════════════════════════
+
+BEFORE (Confusing):
+  ❌ 3 workflows doing similar things
+  ❌ deploy.yml and deploy-codebuild.yml both exist
+  ❌ Unclear which one runs when
+  ❌ Duplicate code everywhere
+
+AFTER (Clear):
+  ✅ 2 workflows with clear purposes
+  ✅ ci.yml - Quality checks only
+  ✅ deploy.yml - Build & deploy only
+  ✅ No duplication
+
+───────────────────────────────────────────────────────────
+
+WORKFLOW 1: CI (Quality Checks)
+  File: .github/workflows/ci.yml
+  Runs: Every push & PR
+  Does: Lint → Type Check → Build → Security Audit
+  Time: ~2-3 minutes
+  Purpose: Fast feedback, no deployment
+
+WORKFLOW 2: CD (Deployment)  
+  File: .github/workflows/deploy.yml
+  Runs: Push to main/dev OR manual trigger
+  Does: CodeBuild (build Docker) → Terraform (deploy)
+  Time: ~6-8 minutes
+  Purpose: Deploy to AWS App Runner
+
+───────────────────────────────────────────────────────────
+
+BRANCH → ENVIRONMENT:
+  dev  → Staging (auto-deploy)
+  main → Production (auto-deploy)
+
+───────────────────────────────────────────────────────────
+
+DOCUMENTATION:
+  📖 Quick Start:    .github/QUICK_START.md
+  📚 Full Guide:     .github/WORKFLOW_GUIDE.md
+  📋 Reference:      .github/workflows/README.md
+
+═══════════════════════════════════════════════════════════
