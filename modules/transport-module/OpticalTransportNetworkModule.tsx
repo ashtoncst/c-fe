@@ -104,7 +104,9 @@ export const OpticalTransportNetworkModule = (): React.JSX.Element => {
                     <Footer />
                 </div>
             </div>
-            <DownloadModal isOpen={modalOpen} onClose={() => setModalOpen(false)} downloadUrl={BROCHURE_URLS.opticalTransportNetwork} />
+            {/* The Metro Lambda card on the Data page routes here; the Ethernet & Metro
+                Lambda e-brochure covers this product until a dedicated OTN PDF exists. */}
+            <DownloadModal isOpen={modalOpen} onClose={() => setModalOpen(false)} downloadUrl={BROCHURE_URLS.metroEthernet} />
         </>
     );
 };

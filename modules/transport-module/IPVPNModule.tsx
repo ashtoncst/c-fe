@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { StickyHeader } from "@/components/layouts/StickyHeader";
 import { Footer } from "@/components/layouts/Footer";
 import { PageHeroWithMobileCard } from "@/components/hero/PageHero";
 import { DesignedForGuestSection } from "@/modules/hospitality/components/DesignedForGuestSection";
 import { ProductsSection } from "@/components/sections/ProductsSection";
-import { DownloadModal } from "@/components/modals/DownloadModal";
 import { TestimonialSection } from "@/components/ui/TestimonialSection";
-import { BROCHURE_URLS } from "@/config/brochures";
 
 const IPVPN_FEATURES = [
     {
@@ -60,8 +58,6 @@ const IPVPN_PRODUCTS = [
 ];
 
 export const IPVPNModule = (): React.JSX.Element => {
-    const [modalOpen, setModalOpen] = useState(false);
-
     return (
         <>
             <div className="w-full flex justify-center bg-[#F5F5F5] min-h-screen">
@@ -77,8 +73,7 @@ export const IPVPNModule = (): React.JSX.Element => {
                                 </>
                             }
                             description="A dedicated, private network connectivity service that securely links remote offices together using MPLS technology."
-                            buttonLabel="Download"
-                            onButtonClick={() => setModalOpen(true)}
+                            buttonLabel=""
                             backgroundImage="/images/ipvpn/shuttersctock_24146703.png"
                             bottomGradient="none"
                         />
@@ -107,7 +102,6 @@ export const IPVPNModule = (): React.JSX.Element => {
                     <Footer />
                 </div>
             </div>
-            <DownloadModal isOpen={modalOpen} onClose={() => setModalOpen(false)} downloadUrl={BROCHURE_URLS.ipvpn} />
         </>
     );
 };

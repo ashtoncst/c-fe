@@ -84,7 +84,7 @@ export const DATA_CENTER_SERVICE_SOLUTION = [
   {
     id: uuidv4(),
     title: "Up and running",
-    image: "/images/colocation/pasig-reliance-dc.jpg",
+    image: "/images/colocation/pasig-reliance-dc-2.png",
 
     desc: ["Pasig Data Center"],
   },

@@ -12,8 +12,9 @@ export const BROCHURE_URLS = {
   fiberDedicated: "/brochures/fiber-dedicated.pdf",
   iptExpress: "/brochures/ipt-express.pdf",
   ixExpress: "/brochures/ix-express.pdf",
-  dedicatedInternetAccess: "/brochures/dedicated-internet-access.pdf",
-  fiberBroadband: "/brochures/fiber-broadband.pdf",
+  // Serving the GBG Omnibus brochure until product-specific PDFs are provided
+  dedicatedInternetAccess: "/brochures/gbg-omnibus.pdf",
+  fiberBroadband: "/brochures/gbg-omnibus.pdf",
 
   // Transport
   metroEthernet: "/brochures/metro-ethernet.pdf",
@@ -26,7 +27,8 @@ export const BROCHURE_URLS = {
   faster: "/brochures/faster.pdf",
 
   // Security
-  security: "/brochures/security.pdf",
+  // Serving the GBG Omnibus brochure until a product-specific PDF is provided
+  security: "/brochures/gbg-omnibus.pdf",
   secureInternet: "/brochures/secure-internet.pdf",
   antiDdos: "/brochures/anti-ddos.pdf",
 
@@ -35,15 +37,17 @@ export const BROCHURE_URLS = {
   contentPlus: "/brochures/content-plus.pdf",
 
   // Managed Services
-  managedServices: "/brochures/managed-services.pdf",
+  // Serving the GBG Omnibus brochure until a product-specific PDF is provided
+  managedServices: "/brochures/gbg-omnibus.pdf",
   managedWifi: "/brochures/managed-wifi.pdf",
   managedSurveillance: "/brochures/managed-surveillance.pdf",
   sdWan: "/brochures/sd-wan.pdf",
   draas: "/brochures/draas.pdf",
 
   // Solutions
-  dataCenters: "/brochures/data-centers.pdf",
-  data: "/brochures/data.pdf",
+  // Serving the GBG Omnibus brochure until product-specific PDFs are provided
+  dataCenters: "/brochures/gbg-omnibus.pdf",
+  data: "/brochures/gbg-omnibus.pdf",
   digitalInfrastructure: "/brochures/digital-infrastructure.pdf",
   distributedSetup: "/brochures/distributed-setup.pdf",
   globallyCertified: "/brochures/globally-certified.pdf",

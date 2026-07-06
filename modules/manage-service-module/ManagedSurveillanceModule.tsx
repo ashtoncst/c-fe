@@ -1,16 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { StickyHeader } from "@/components/layouts/StickyHeader";
 import { Footer } from "@/components/layouts/Footer";
 import { PageHeroWithMobileCard } from "@/components/hero/PageHero";
 import { DesignedForGuestSection } from "@/modules/hospitality/components/DesignedForGuestSection";
 import { ProductsSection } from "@/components/sections/ProductsSection";
-import { DownloadModal } from "@/components/modals/DownloadModal";
 import { TestimonialSection } from "@/components/ui/TestimonialSection";
-import { BROCHURE_URLS } from "@/config/brochures";
 
 export const ManagedSurveillanceModule = (): React.JSX.Element => {
-  const [modalOpen, setModalOpen] = useState(false);
   return (
     <>
       <div className="w-full flex justify-center bg-[#F5F5F5] min-h-screen">
@@ -27,8 +24,7 @@ export const ManagedSurveillanceModule = (): React.JSX.Element => {
                 </>
               }
               description="AI-powered video surveillance and monitoring solutions — protecting your facilities, assets, and people with intelligent threat detection and 24/7 management."
-              buttonLabel="Download"
-              onButtonClick={() => setModalOpen(true)}
+              buttonLabel=""
             />
             <div className="relative z-10 md:-mt-20">
               <DesignedForGuestSection
@@ -123,7 +119,6 @@ export const ManagedSurveillanceModule = (): React.JSX.Element => {
           <Footer />
         </div>
       </div>
-      <DownloadModal isOpen={modalOpen} onClose={() => setModalOpen(false)} downloadUrl={BROCHURE_URLS.managedSurveillance} />
     </>
   );
 };

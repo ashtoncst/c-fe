@@ -2,122 +2,36 @@
 
 import { useState } from "react";
 import { MapIcon } from "@/assets/icons/MapIcon";
-import { Location1 } from "@/assets/icons/colocation-pop-up/Location1";
-import { Location2 } from "@/assets/icons/colocation-pop-up/Location2";
-import { Location3 } from "@/assets/icons/colocation-pop-up/Location3";
-import { Location4 } from "@/assets/icons/colocation-pop-up/Location4";
-import { Location5 } from "@/assets/icons/colocation-pop-up/Location5";
-import { Location6 } from "@/assets/icons/colocation-pop-up/Location6";
-import { Location7 } from "@/assets/icons/colocation-pop-up/Location7";
+import { DATA_CENTER_SERVICE_SOLUTION } from "@/modules/colocation-data-module/constants";
+import { LocationPopup } from "./LocationPopup";
+
+// Hand-tuned vertical offsets so each popup sits next to its map pin,
+// carried over from the previous per-location SVG positioning.
+const POPUP_TOP_DESKTOP: Record<number, string> = {
+    1: "top-[60px]",
+    2: "top-[120px]",
+    3: "top-[220px]",
+    4: "top-[270px]",
+    5: "top-[60px]",
+    6: "top-[180px]",
+    7: "top-[480px]",
+};
+
+const POPUP_TOP_MOBILE: Record<number, string> = {
+    1: "top-[35px]",
+    2: "top-[78px]",
+    3: "top-[98px]",
+    4: "top-[118px]",
+    5: "top-[98px]",
+    6: "top-[128px]",
+    7: "top-[250px]",
+};
 
 export const MultiEdgeSection = () => {
     const [currentItem, setCurrentItem] = useState(1);
 
-    const handleDisplayPopupMobile = () => {
-        switch (currentItem) {
-            case 1:
-                return (
-                    <div className="absolute z-10 top-[35px] -right-[20px]">
-                        <Location1 className="w-[220px] h-[240px]" />
-                    </div>
-                );
-            case 2:
-                return (
-                    <div className="absolute z-10 top-[78px] -right-[20px]">
-                        <Location2 className="w-[220px] h-[240px]" />
-                    </div>
-                );
-            case 3:
-                return (
-                    <div className="absolute z-10 top-[98px] -right-[20px]">
-                        <Location3 className="w-[220px] h-[240px]" />
-                    </div>
-                );
-            case 4:
-                return (
-                    <div className="absolute z-10 top-[118px] -right-[20px]">
-                        <Location4 className="w-[220px] h-[240px]" />
-                    </div>
-                );
-            case 5:
-                return (
-                    <div className="absolute z-10 top-[98px] -right-[20px]">
-                        <Location5 className="w-[220px] h-[240px]" />
-                    </div>
-                );
-            case 6:
-                return (
-                    <div className="absolute z-10 top-[128px] -right-[20px]">
-                        <Location6 className="w-[220px] h-[240px]" />
-                    </div>
-                );
-            case 7:
-                return (
-                    <div className="absolute z-10 top-[250px] -right-[20px]">
-                        <Location7 className="w-[220px] h-[240px]" />
-                    </div>
-                );
-            default:
-                return (
-                    <div className="absolute z-10 top-[35px] -right-[20px]">
-                        <Location1 className="w-[220px] h-[240px]" />
-                    </div>
-                );
-        }
-    };
-
-    const handleDisplayPopup = () => {
-        switch (currentItem) {
-            case 1:
-                return (
-                    <div className="absolute z-10 top-[60px] -right-[30px] lg:-right-[40px]">
-                        <Location1 className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]" />
-                    </div>
-                );
-            case 2:
-                return (
-                    <div className="absolute z-10 top-[120px] -right-[30px] lg:-right-[40px]">
-                        <Location2 className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]" />
-                    </div>
-                );
-            case 3:
-                return (
-                    <div className="absolute z-10 top-[220px] -right-[30px] lg:-right-[40px]">
-                        <Location3 className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]" />
-                    </div>
-                );
-            case 4:
-                return (
-                    <div className="absolute z-10 top-[270px] -right-[30px] lg:-right-[40px]">
-                        <Location4 className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]" />
-                    </div>
-                );
-            case 5:
-                return (
-                    <div className="absolute z-10 top-[60px] -right-[30px] lg:-right-[40px]">
-                        <Location5 className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]" />
-                    </div>
-                );
-            case 6:
-                return (
-                    <div className="absolute z-10 top-[180px] -right-[30px] lg:-right-[40px]">
-                        <Location6 className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]" />
-                    </div>
-                );
-            case 7:
-                return (
-                    <div className="absolute z-10 top-[480px] -right-[30px] lg:-right-[40px]">
-                        <Location7 className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]" />
-                    </div>
-                );
-            default:
-                return (
-                    <div className="absolute z-10 top-[60px] -right-[30px] lg:-right-[40px]">
-                        <Location1 className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]" />
-                    </div>
-                );
-        }
-    };
+    const location =
+        DATA_CENTER_SERVICE_SOLUTION[currentItem - 1] ?? DATA_CENTER_SERVICE_SOLUTION[0];
 
     return (
         <section className="relative w-full bg-gray-50 rounded-t-[64px] xl:rounded-t-[96px] z-[40]">
@@ -148,7 +62,16 @@ export const MultiEdgeSection = () => {
                             width="480"
                             height="665"
                         />
-                        {handleDisplayPopup()}
+                        <div
+                            className={`absolute z-10 -right-[30px] lg:-right-[40px] ${POPUP_TOP_DESKTOP[currentItem] ?? "top-[60px]"}`}
+                        >
+                            <LocationPopup
+                                status={location.title}
+                                name={location.desc[0]}
+                                image={location.image}
+                                className="w-[240px] h-[260px] lg:w-[290px] lg:h-[310px]"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,7 +103,16 @@ export const MultiEdgeSection = () => {
                             width="280"
                             height="388"
                         />
-                        {handleDisplayPopupMobile()}
+                        <div
+                            className={`absolute z-10 -right-[20px] ${POPUP_TOP_MOBILE[currentItem] ?? "top-[35px]"}`}
+                        >
+                            <LocationPopup
+                                status={location.title}
+                                name={location.desc[0]}
+                                image={location.image}
+                                className="w-[220px] h-[240px]"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
