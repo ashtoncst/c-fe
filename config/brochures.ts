@@ -68,7 +68,7 @@ export const BROCHURE_URLS = {
   partners: "/brochures/partners.pdf",
 
   // Connectivity
-  satellite: "/brochures/satellite.pdf",
+  satellite: "/brochures/starlink.pdf",
 } as const;
 
 /**
@@ -87,6 +87,9 @@ export const BROCHURE_LABELS: Record<string, string> = {
   [BROCHURE_URLS.gbgOmnibus]: "GBG Omnibus",
   [BROCHURE_URLS.intelligentCampus]: "Intelligent Campus",
   [BROCHURE_URLS.metroEthernet]: "Metro Ethernet",
+  [BROCHURE_URLS.sdWan]: "SD-WAN",
+  [BROCHURE_URLS.managedWifi]: "Managed WiFi",
+  [BROCHURE_URLS.satellite]: "Starlink for Business",
 };
 
 export function getBrochureLabel(url: string | undefined): string {

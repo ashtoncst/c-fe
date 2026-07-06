@@ -55,6 +55,9 @@ export const DATA_CENTER_SERVICE_SOLUTION = [
   },
   {
     id: uuidv4(),
+    // NOTE: "Up and running" per the internal team's June 2026 status update.
+    // The client's re-test list (July 2026) only covered items 3, 5, 7 —
+    // pending client confirmation whether La Union should show "Upcoming".
     title: "Up and running",
     image: "/images/colocation/la-union-dc.png",
 
